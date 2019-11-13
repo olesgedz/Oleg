@@ -13,93 +13,187 @@ using System.Timers;
 
 namespace Snake
 {
-    class Program
-    {
-        class Point{
-            public int x;
-            public int y;
-            public Point(int x, int y)
-            {
-                this.x = x;
-                this.y = y;
-            }
-        }
-        class Snake
-        {
-           public Point position;
-            public Snake(int x, int y)
-            {
-                position =  new Point(x,y);
-            }
-        }
-        class Map
-        {
+	enum Direction
+	{
+		UP,
+		DOWN,
+		LEFT,
+		RIGHT
+	};
+	class Program
+	{
+		class Point{
+			public int x;
+			public int y;
+			public Point(int x, int y)
+			{
+				this.x = x;
+				this.y = y;
+			}
+			public Point()
+			{
+			}
+		}
+		class Snake
+		{
+		   public Point[] position;
+		   public int length;
+			public Snake(int x, int y)
+			{
+				this.length = 5;
+				position = new Point[10];
+				for(int i = 0; i < 10; i++)
+				{
+					position[i] = new Point();
+				}
+				position[0].x = x;
+				position[0].y = y;
+				for(int i = 0; i < this.length; i++)
+				{
+					if (i > 0)
+					{
+						position[i].x = position[i-1].x+1;
+						position[i].y = position[i-1].y;
+					}
+				}
+				
+			}
+			public  void Move_Tail()
+			{
+				Point temp = new Point();
+				Point temp1 = new Point();
+				for(int i = 0; i < length; i++)
+				{
+			
+					temp.x = position[i].x;
+					temp.y = position[i].y;
 
-            public int width;
-            public int height;
-            public  char[, ] map;
-            public Map(int height, int width)
-            {
-                this.width = width;
-                this.height = height;
-                map = new char[height, width];
-                fill();
-            } 
-            
-            public void draw(Snake snake)
-            {
-                for(int j = 0; j < height; j++)
-                {
-                    for(int k = 0; k < width; k++)
-                    {
-                        if (snake.position.y == j && snake.position.x == k)
-                            Console.Write("X");
-                        else    
-                            Console.Write(map[j,k]);
+					if (i > 0)
+					{
+						position[i].x = temp1.x;
+						position[i].y = temp1.y;
 
-                    }
-                        Console.Write("\n");
-                }
-            }
+					}
 
-             public void fill()
-            {
-                for(int j = 0; j < height; j++)
-                {
-                    for(int k = 0; k < width; k++)
-                    {
-                        map[j,k] = '0';
-                    }
-                }
-            }
-        }
-        static void Main(string[] args)
-        {
-            Map map = new Map(20,20);
-            Snake snake = new Snake(10,10);
-            DateTime TimeNow = DateTime.Now;
-            double waitTime = 200;
-            while (true)
-            {
-            
-                if (TimeNow.AddMilliseconds(waitTime) < DateTime.Now)
-                {
-                    TimeNow = DateTime.Now;
-                    Console.Clear();
-                    map.draw(snake);
-                    if (Console.KeyAvailable)
-                    {
-                        ConsoleKeyInfo toets = Console.ReadKey(true);
-                            if (toets.Key.Equals(ConsoleKey.UpArrow))
-                            {
-                                Console.WriteLine("Hello\n");
-                                break;
-                            }
-                    }
-                }
-            }
-        }
-    }
+					temp1.x = temp.x;
+					temp1.y = temp.y;
+					
+				}	
+			}
+			public  void MoveUp()
+			{
+				Move_Tail();
+				this.position[0].y--;
+			}
+			public  void MoveDown()
+			{
+				Move_Tail();
+
+				this.position[0].y++;
+			}
+			public  void MoveLeft()
+			{
+				Move_Tail();
+
+				this.position[0].x--;
+			}
+			public  void MoveRight()
+			{
+				Move_Tail();
+
+				this.position[0].x++;
+			}
+		}
+		class Map
+		{
+
+			public int width;
+			public int height;
+			public  char[, ] map;
+			public Map(int height, int width)
+			{
+				this.width = width;
+				this.height = height;
+				map = new char[height, width];
+				fill();
+			} 
+			
+			public void draw(Snake snake)
+			{
+				int flag = 0;
+				for(int j = 0; j < height; j++)
+				{
+					for(int k = 0; k < width; k++)
+					{
+						for(int i = 0; i <= snake.length; i++)
+						{
+							if (snake.position[i].x == k && snake.position[i].y == j)
+							{
+								Console.Write("X");
+								flag = 1;
+							}
+						}
+						if (flag == 0)
+							Console.Write(map[j,k]);
+						flag = 0;
+
+					}
+						Console.Write("\n");
+				}
+				Console.WriteLine("x{0}y{1}\n", snake.position[0].x, snake.position[0].y);
+				Console.WriteLine("x{0}y{1}\n", snake.position[1].x, snake.position[1].y);
+
+			}
+
+			public void fill()
+			{
+				for(int j = 0; j < height; j++)
+				{
+					for(int k = 0; k < width; k++)
+					{
+						map[j,k] = '0';
+					}
+				}
+			}
+		}
+		static void Main(string[] args)
+		{
+			Map map = new Map(20,20);
+			Snake snake = new Snake(10,10);
+			DateTime TimeNow = DateTime.Now;
+			double waitTime = 200;
+			while (true)
+			{
+			
+				if (TimeNow.AddMilliseconds(waitTime) < DateTime.Now)
+				{
+					TimeNow = DateTime.Now;
+					Console.Clear();
+					map.draw(snake);
+					if (Console.KeyAvailable)
+					{
+						ConsoleKeyInfo toets = Console.ReadKey(true);
+							if (toets.Key.Equals(ConsoleKey.UpArrow))
+							{
+								snake.MoveUp();
+							}
+							if (toets.Key.Equals(ConsoleKey.DownArrow))
+							{
+								snake.MoveDown();
+							}
+							if (toets.Key.Equals(ConsoleKey.RightArrow))
+							{
+								snake.MoveRight();
+							}
+							if (toets.Key.Equals(ConsoleKey.LeftArrow))
+							{
+								snake.MoveLeft();
+							}
+					}
+				}
+			}
+		}
+	}
 }
 
 // namespace Snake
